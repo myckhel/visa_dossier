@@ -1,4 +1,4 @@
-## AnchorLess Technical Assessment: VISA Dossier: Upload Feature
+## VISA Dossier: Upload Feature
 
 ---
 
