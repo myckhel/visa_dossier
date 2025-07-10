@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* Ant Design CSS */
+@import "antd/dist/reset.css";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+html,
+body {
+  @apply bg-white dark:bg-gray-950;
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
+
+/* Custom styles for Visa Dossier App */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-header {
+  @apply shadow-sm;
+}
+
+.ant-layout-content {
+  @apply p-6;
+}
+
+/* Document upload area styling */
+.document-upload-area {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors;
+}
+
+.document-upload-area.uploading {
+  @apply border-blue-500 bg-blue-50;
+}
+
+/* Document category sections */
+.document-category {
+  @apply bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4;
+}
+
+.document-category-title {
+  @apply text-lg font-semibold text-gray-800 mb-2;
+}
+
+.document-category-description {
+  @apply text-sm text-gray-600 mb-4;
+}
+
+/* Document list styling */
+.document-item {
+  @apply border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow;
+}
+
+.document-thumbnail {
+  @apply w-16 h-16 rounded border object-cover;
+}
+
+/* File status indicators */
+.file-status-success {
+  @apply text-green-600;
+}
+
+.file-status-error {
+  @apply text-red-600;
+}
+
+.file-status-uploading {
+  @apply text-blue-600;
+}

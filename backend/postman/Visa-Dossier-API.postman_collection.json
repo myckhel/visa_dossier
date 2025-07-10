@@ -1,0 +1,2267 @@
+{
+    "info": {
+        "_postman_id": "a831ae7b-cf24-4b1b-9bb3-90455fda1b0f",
+        "name": "Visa Dossier API",
+        "description": "Comprehensive API collection for Visa Dossier Management System\n\n## Features\n- Complete CRUD operations for dossiers and documents\n- Laravel Sanctum authentication\n- Token management\n- File upload and download\n- Dynamic environment variables\n- Automated testing\n\n## Authentication\nThe API uses Laravel Sanctum for authentication. After login, the Bearer token is automatically set for all protected endpoints.\n\n## Environment Variables\n- `base_url`: API base URL (default: http://localhost:8000)\n- `auth_token`: Bearer token (automatically set after login)\n- `user_id`: Current user ID (set after login)\n- `dossier_id`: Current dossier ID (set after creating/selecting dossier)\n- `document_id`: Current document ID (set after uploading document)\n\n## Usage\n1. Set up environment variables\n2. Register or login to get authentication token\n3. Create dossiers and upload documents\n4. Use the automated tests to validate responses\n\nCreated: July 9, 2025\nVersion: 1.0.0",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "9558301"
+    },
+    "item": [
+        {
+            "name": "🏠 Environment Setup",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('API is healthy', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response time is acceptable', function () {",
+                                    "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api"
+                            ]
+                        },
+                        "description": "Basic health check to verify API connectivity"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Environment setup and connectivity tests"
+        },
+        {
+            "name": "🔐 Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('User registered successfully', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains user and token', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('user');",
+                                    "    pm.expect(responseJson).to.have.property('token');",
+                                    "    pm.expect(responseJson.user).to.have.property('id');",
+                                    "    pm.expect(responseJson.user).to.have.property('email');",
+                                    "    ",
+                                    "    // Store auth token and user ID for subsequent requests",
+                                    "    pm.environment.set('auth_token', responseJson.token);",
+                                    "    pm.environment.set('user_id', responseJson.user.id);",
+                                    "    pm.environment.set('user_email', responseJson.user.email);",
+                                    "});",
+                                    "",
+                                    "pm.test('User data structure is valid', function () {",
+                                    "    const user = pm.response.json().user;",
+                                    "    pm.expect(user).to.have.property('name');",
+                                    "    pm.expect(user).to.have.property('email');",
+                                    "    pm.expect(user).to.have.property('created_at');",
+                                    "    pm.expect(user).to.have.property('updated_at');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"{{$randomFullName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"device_name\": \"Postman API Testing\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user account. Uses dynamic data for testing.\n\n**Required Fields:**\n- name: User's full name\n- email: Valid email address (must be unique)\n- password: Minimum 6 characters\n- password_confirmation: Must match password\n- device_name: Optional device identifier"
+                    },
+                    "response": [
+                        {
+                            "name": "Register User",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"{{$randomFullName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"device_name\": \"Postman API Testing\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/auth/register",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "auth",
+                                        "register"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 21:48:20 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Angelina Rogahn\",\n        \"email\": \"Carlee_Wiegand67@yahoo.com\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2025-07-09T21:48:20.000000Z\",\n        \"updated_at\": \"2025-07-09T21:48:20.000000Z\"\n    },\n    \"token\": \"1|bQFrP6Tk0sO6Q81esyTN6tTV9uapWUvpdwvrHdyD026faaee\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Login User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login successful', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains user and token', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('user');",
+                                    "    pm.expect(responseJson).to.have.property('token');",
+                                    "    ",
+                                    "    // Store auth token and user ID for subsequent requests",
+                                    "    pm.environment.set('auth_token', responseJson.token);",
+                                    "    pm.environment.set('user_id', responseJson.user.id);",
+                                    "    pm.environment.set('user_email', responseJson.user.email);",
+                                    "});",
+                                    "",
+                                    "pm.test('Token is valid format', function () {",
+                                    "    const token = pm.response.json().token;",
+                                    "    pm.expect(token).to.be.a('string');",
+                                    "    pm.expect(token.length).to.be.above(10);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"device_name\": \"Postman API Testing\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Authenticate user and receive access token.\n\n**Required Fields:**\n- email: Registered user email\n- password: User password\n- device_name: Optional device identifier\n\n**Response:**\n- user: User object with profile information\n- token: Bearer token for API authentication"
+                    },
+                    "response": [
+                        {
+                            "name": "Login User",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"Carlee_Wiegand67@yahoo.com\",\n    \"password\": \"password123\",\n    \"device_name\": \"Postman API Testing\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/auth/login",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "auth",
+                                        "login"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 21:48:53 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Angelina Rogahn\",\n        \"email\": \"Carlee_Wiegand67@yahoo.com\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2025-07-09T21:48:20.000000Z\",\n        \"updated_at\": \"2025-07-09T21:48:20.000000Z\"\n    },\n    \"token\": \"2|QkoDFUPBEAAiCHJaXmenplC0c6n6WYRlATLHnWybbea0368c\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get User Profile",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Profile retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains user data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('user');",
+                                    "    pm.expect(responseJson.user).to.have.property('id');",
+                                    "    pm.expect(responseJson.user).to.have.property('email');",
+                                    "    pm.expect(responseJson.user).to.have.property('name');",
+                                    "});",
+                                    "",
+                                    "pm.test('User ID matches stored value', function () {",
+                                    "    const userId = pm.response.json().user.id;",
+                                    "    const storedUserId = pm.environment.get('user_id');",
+                                    "    pm.expect(userId.toString()).to.equal(storedUserId.toString());",
+                                    "});"
+                                ],
+                                "type": "text/javascript",
+                                "packages": {}
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/user",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "user"
+                            ]
+                        },
+                        "description": "Get authenticated user profile information.\n\n**Authentication:** Bearer token required\n\n**Response:**\n- user: Complete user profile data"
+                    },
+                    "response": [
+                        {
+                            "name": "Get User Profile",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/auth/user",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "auth",
+                                        "user"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 21:48:59 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Angelina Rogahn\",\n        \"email\": \"Carlee_Wiegand67@yahoo.com\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2025-07-09T21:48:20.000000Z\",\n        \"updated_at\": \"2025-07-09T21:48:20.000000Z\"\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Logout successful', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains success message', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson.message).to.include('logged out');",
+                                    "});",
+                                    "",
+                                    "// Clear stored authentication data",
+                                    "pm.environment.unset('auth_token');",
+                                    "pm.environment.unset('user_id');",
+                                    "pm.environment.unset('user_email');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "description": "Logout user and revoke current access token.\n\n**Authentication:** Bearer token required\n\n**Effect:** Current token becomes invalid"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "User authentication endpoints using Laravel Sanctum",
+            "auth": {
+                "type": "bearer",
+                "bearer": [
+                    {
+                        "key": "token",
+                        "value": "{{auth_token}}",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "🎫 Token Management",
+            "item": [
+                {
+                    "name": "List User Tokens",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Tokens retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains tokens array', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('tokens');",
+                                    "    pm.expect(responseJson.tokens).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test('Token structure is valid', function () {",
+                                    "    const tokens = pm.response.json().tokens;",
+                                    "    if (tokens.length > 0) {",
+                                    "        const token = tokens[0];",
+                                    "        pm.expect(token).to.have.property('id');",
+                                    "        pm.expect(token).to.have.property('name');",
+                                    "        pm.expect(token).to.have.property('abilities');",
+                                    "        pm.expect(token).to.have.property('last_used_at');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/tokens",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tokens"
+                            ]
+                        },
+                        "description": "Get list of all active tokens for the authenticated user.\n\n**Authentication:** Bearer token required\n\n**Response:**\n- tokens: Array of token objects with metadata"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create New Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Token created successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains token', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('token');",
+                                    "    pm.expect(responseJson.token).to.be.a('string');",
+                                    "});",
+                                    "",
+                                    "pm.test('Token is valid format', function () {",
+                                    "    const token = pm.response.json().token;",
+                                    "    pm.expect(token.length).to.be.above(10);",
+                                    "    ",
+                                    "    // Store the new token ID for potential cleanup",
+                                    "    pm.environment.set('new_token', token);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"API Testing Token - {{$timestamp}}\",\n    \"abilities\": [\"*\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/tokens",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tokens"
+                            ]
+                        },
+                        "description": "Create a new personal access token.\n\n**Authentication:** Bearer token required\n\n**Required Fields:**\n- name: Descriptive name for the token\n- abilities: Array of token abilities (use [\"*\"] for all permissions)\n\n**Response:**\n- token: Plain text token (only visible once)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Revoke Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Token revoked successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains success message', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson.message).to.include('revoked');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/tokens/{{token_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tokens",
+                                "{{token_id}}"
+                            ]
+                        },
+                        "description": "Revoke a specific personal access token.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- token_id: ID of the token to revoke\n\n**Note:** You cannot revoke the currently used token"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Personal access token management endpoints",
+            "auth": {
+                "type": "bearer",
+                "bearer": [
+                    {
+                        "key": "token",
+                        "value": "{{auth_token}}",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "📁 Dossier Management",
+            "item": [
+                {
+                    "name": "List Dossiers",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dossiers retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains data array', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test('Dossier structure is valid', function () {",
+                                    "    const dossiers = pm.response.json().data;",
+                                    "    if (dossiers.length > 0) {",
+                                    "        const dossier = dossiers[0];",
+                                    "        pm.expect(dossier).to.have.property('id');",
+                                    "        pm.expect(dossier).to.have.property('passport_number');",
+                                    "        pm.expect(dossier).to.have.property('nationality');",
+                                    "        pm.expect(dossier).to.have.property('visa_type');",
+                                    "        pm.expect(dossier).to.have.property('application_status');",
+                                    "        ",
+                                    "        // Store first dossier ID for use in other requests",
+                                    "        pm.environment.set('dossier_id', dossier.id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers"
+                            ]
+                        },
+                        "description": "Get list of all dossiers for the authenticated user.\n\n**Authentication:** Bearer token required\n\n**Response:**\n- data: Array of dossier objects\n- meta: Metadata about the collection"
+                    },
+                    "response": [
+                        {
+                            "name": "List Dossiers",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:16:36 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 2,\n            \"user_id\": 1,\n            \"passport_number\": \"f914\",\n            \"nationality\": \"VN\",\n            \"date_of_birth\": \"1990-05-15\",\n            \"visa_type\": \"tourist\",\n            \"visa_type_label\": \"Tourist Visa\",\n            \"application_status\": \"draft\",\n            \"application_status_label\": \"Draft\",\n            \"application_status_color\": \"gray\",\n            \"assigned_officer\": null,\n            \"notes\": null,\n            \"additional_data\": {\n                \"emergency_contact\": \"+1-555-0123\",\n                \"purpose_of_visit\": \"Tourism and sightseeing\",\n                \"intended_duration\": \"2 weeks\"\n            },\n            \"documents\": [\n                {\n                    \"id\": 5,\n                    \"dossier_id\": 2,\n                    \"document_type\": \"passport\",\n                    \"document_type_label\": \"Passport\",\n                    \"name\": \"Passport - Jody Wintheiser\",\n                    \"description\": \"Passport document uploaded via Postman API testing\",\n                    \"file_size\": 115284,\n                    \"file_size_formatted\": \"112.58 KB\",\n                    \"mime_type\": \"image/jpeg\",\n                    \"original_filename\": \"cropped-20240731_134218.jpg\",\n                    \"file_url\": \"/storage/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n                    \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n                    \"thumbnail_url\": \"/storage/5/conversions/passport_2025-07-09_22-05-20_aa901071-thumb.jpg\",\n                    \"uploaded_at\": \"2025-07-09T22:05:20.000000Z\",\n                    \"updated_at\": \"2025-07-09T22:05:20.000000Z\"\n                },\n                {\n                    \"id\": 6,\n                    \"dossier_id\": 2,\n                    \"document_type\": \"passport\",\n                    \"document_type_label\": \"Passport\",\n                    \"name\": \"Passport - Antonio Feeney DDS\",\n                    \"description\": \"Passport document uploaded via Postman API testing\",\n                    \"file_size\": 115284,\n                    \"file_size_formatted\": \"112.58 KB\",\n                    \"mime_type\": \"image/jpeg\",\n                    \"original_filename\": \"cropped-20240731_134218.jpg\",\n                    \"file_url\": \"http://localhost:8000/storage/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n                    \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n                    \"thumbnail_url\": \"http://localhost:8000/storage/6/conversions/passport_2025-07-09_22-08-23_10dcbc7c-thumb.jpg\",\n                    \"uploaded_at\": \"2025-07-09T22:08:23.000000Z\",\n                    \"updated_at\": \"2025-07-09T22:08:23.000000Z\"\n                },\n                {\n                    \"id\": 8,\n                    \"dossier_id\": 2,\n                    \"document_type\": \"passport\",\n                    \"document_type_label\": \"Passport\",\n                    \"name\": \"Passport - Ernest Dooley\",\n                    \"description\": \"Passport document uploaded via Postman API testing\",\n                    \"file_size\": 129990,\n                    \"file_size_formatted\": \"126.94 KB\",\n                    \"mime_type\": \"application/pdf\",\n                    \"original_filename\": \"visa_dossier.pdf\",\n                    \"file_url\": \"http://localhost:8000/storage/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n                    \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n                    \"thumbnail_url\": \"http://localhost:8000/storage/8/conversions/passport_2025-07-09_22-15-26_8c933413-thumb.jpg\",\n                    \"uploaded_at\": \"2025-07-09T22:15:26.000000Z\",\n                    \"updated_at\": \"2025-07-09T22:15:26.000000Z\"\n                }\n            ],\n            \"created_at\": \"2025-07-09T22:05:10.000000Z\",\n            \"updated_at\": \"2025-07-09T22:05:10.000000Z\",\n            \"has_required_documents\": false,\n            \"can_submit\": false\n        }\n    ],\n    \"meta\": {\n        \"total_count\": 1,\n        \"total_size\": 0,\n        \"total_size_formatted\": null\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Dossier",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dossier created successfully', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains dossier data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.have.property('id');",
+                                    "    ",
+                                    "    // Store dossier ID for use in other requests",
+                                    "    pm.environment.set('dossier_id', responseJson.data.id);",
+                                    "});",
+                                    "",
+                                    "pm.test('Dossier data is correct', function () {",
+                                    "    const dossier = pm.response.json().data;",
+                                    "    const requestBody = JSON.parse(pm.request.body.raw);",
+                                    "    ",
+                                    "    pm.expect(dossier.passport_number).to.equal(requestBody.passport_number);",
+                                    "    pm.expect(dossier.nationality).to.equal(requestBody.nationality);",
+                                    "    pm.expect(dossier.visa_type).to.equal(requestBody.visa_type);",
+                                    "    pm.expect(dossier.application_status).to.equal('draft');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"passport_number\": \"{{$randomAlphaNumeric}}{{$randomInt}}\",\n    \"nationality\": \"{{$randomCountryCode}}\",\n    \"date_of_birth\": \"1990-05-15\",\n    \"visa_type\": \"tourist\",\n    \"additional_data\": {\n        \"purpose_of_visit\": \"Tourism and sightseeing\",\n        \"intended_duration\": \"2 weeks\",\n        \"emergency_contact\": \"+1-555-0123\"\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers"
+                            ]
+                        },
+                        "description": "Create a new visa dossier.\n\n**Authentication:** Bearer token required\n\n**Required Fields:**\n- passport_number: Unique passport number (alphanumeric)\n- nationality: Country code or name\n- date_of_birth: Date in YYYY-MM-DD format\n- visa_type: One of: tourist, student, work, business, transit\n\n**Optional Fields:**\n- additional_data: JSON object with extra information\n\n**Visa Types:**\n- tourist: Tourism visa\n- student: Student visa\n- work: Work visa\n- business: Business visa\n- transit: Transit visa"
+                    },
+                    "response": [
+                        {
+                            "name": "Create Dossier",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"passport_number\": \"{{$randomAlphaNumeric}}{{$randomInt}}\",\n    \"nationality\": \"{{$randomCountryCode}}\",\n    \"date_of_birth\": \"1990-05-15\",\n    \"visa_type\": \"tourist\",\n    \"additional_data\": {\n        \"purpose_of_visit\": \"Tourism and sightseeing\",\n        \"intended_duration\": \"2 weeks\",\n        \"emergency_contact\": \"+1-555-0123\"\n    }\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:05:10 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Dossier created successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"user_id\": 1,\n        \"passport_number\": \"f914\",\n        \"nationality\": \"VN\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"visa_type\": \"tourist\",\n        \"visa_type_label\": \"Tourist Visa\",\n        \"application_status\": \"draft\",\n        \"application_status_label\": \"Draft\",\n        \"application_status_color\": \"gray\",\n        \"notes\": null,\n        \"additional_data\": {\n            \"emergency_contact\": \"+1-555-0123\",\n            \"purpose_of_visit\": \"Tourism and sightseeing\",\n            \"intended_duration\": \"2 weeks\"\n        },\n        \"created_at\": \"2025-07-09T22:05:10.000000Z\",\n        \"updated_at\": \"2025-07-09T22:05:10.000000Z\",\n        \"has_required_documents\": false,\n        \"can_submit\": false\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Dossier Details",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dossier retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains dossier data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.have.property('id');",
+                                    "    pm.expect(responseJson.data).to.have.property('passport_number');",
+                                    "    pm.expect(responseJson.data).to.have.property('documents');",
+                                    "});",
+                                    "",
+                                    "pm.test('Dossier ID matches requested', function () {",
+                                    "    const dossierId = pm.response.json().data.id;",
+                                    "    const requestedId = pm.environment.get('dossier_id');",
+                                    "    pm.expect(dossierId.toString()).to.equal(requestedId.toString());",
+                                    "});",
+                                    "",
+                                    "pm.test('Documents array is present', function () {",
+                                    "    const dossier = pm.response.json().data;",
+                                    "    pm.expect(dossier).to.have.property('documents');",
+                                    "    pm.expect(dossier.documents).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}"
+                            ]
+                        },
+                        "description": "Get detailed information about a specific dossier including associated documents.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier to retrieve\n\n**Response:**\n- data: Complete dossier object with documents\n- Includes computed fields like has_required_documents and can_submit"
+                    },
+                    "response": [
+                        {
+                            "name": "Get Dossier Details",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:16:51 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"data\": {\n        \"id\": 2,\n        \"user_id\": 1,\n        \"passport_number\": \"f914\",\n        \"nationality\": \"VN\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"visa_type\": \"tourist\",\n        \"visa_type_label\": \"Tourist Visa\",\n        \"application_status\": \"draft\",\n        \"application_status_label\": \"Draft\",\n        \"application_status_color\": \"gray\",\n        \"assigned_officer\": null,\n        \"notes\": null,\n        \"additional_data\": {\n            \"emergency_contact\": \"+1-555-0123\",\n            \"purpose_of_visit\": \"Tourism and sightseeing\",\n            \"intended_duration\": \"2 weeks\"\n        },\n        \"documents\": [\n            {\n                \"id\": 5,\n                \"dossier_id\": 2,\n                \"document_type\": \"passport\",\n                \"document_type_label\": \"Passport\",\n                \"name\": \"Passport - Jody Wintheiser\",\n                \"description\": \"Passport document uploaded via Postman API testing\",\n                \"file_size\": 115284,\n                \"file_size_formatted\": \"112.58 KB\",\n                \"mime_type\": \"image/jpeg\",\n                \"original_filename\": \"cropped-20240731_134218.jpg\",\n                \"file_url\": \"/storage/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n                \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n                \"thumbnail_url\": \"/storage/5/conversions/passport_2025-07-09_22-05-20_aa901071-thumb.jpg\",\n                \"uploaded_at\": \"2025-07-09T22:05:20.000000Z\",\n                \"updated_at\": \"2025-07-09T22:05:20.000000Z\"\n            },\n            {\n                \"id\": 6,\n                \"dossier_id\": 2,\n                \"document_type\": \"passport\",\n                \"document_type_label\": \"Passport\",\n                \"name\": \"Passport - Antonio Feeney DDS\",\n                \"description\": \"Passport document uploaded via Postman API testing\",\n                \"file_size\": 115284,\n                \"file_size_formatted\": \"112.58 KB\",\n                \"mime_type\": \"image/jpeg\",\n                \"original_filename\": \"cropped-20240731_134218.jpg\",\n                \"file_url\": \"http://localhost:8000/storage/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n                \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n                \"thumbnail_url\": \"http://localhost:8000/storage/6/conversions/passport_2025-07-09_22-08-23_10dcbc7c-thumb.jpg\",\n                \"uploaded_at\": \"2025-07-09T22:08:23.000000Z\",\n                \"updated_at\": \"2025-07-09T22:08:23.000000Z\"\n            },\n            {\n                \"id\": 8,\n                \"dossier_id\": 2,\n                \"document_type\": \"passport\",\n                \"document_type_label\": \"Passport\",\n                \"name\": \"Passport - Ernest Dooley\",\n                \"description\": \"Passport document uploaded via Postman API testing\",\n                \"file_size\": 129990,\n                \"file_size_formatted\": \"126.94 KB\",\n                \"mime_type\": \"application/pdf\",\n                \"original_filename\": \"visa_dossier.pdf\",\n                \"file_url\": \"http://localhost:8000/storage/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n                \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n                \"thumbnail_url\": \"http://localhost:8000/storage/8/conversions/passport_2025-07-09_22-15-26_8c933413-thumb.jpg\",\n                \"uploaded_at\": \"2025-07-09T22:15:26.000000Z\",\n                \"updated_at\": \"2025-07-09T22:15:26.000000Z\"\n            }\n        ],\n        \"created_at\": \"2025-07-09T22:05:10.000000Z\",\n        \"updated_at\": \"2025-07-09T22:05:10.000000Z\",\n        \"has_required_documents\": false,\n        \"can_submit\": false\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Dossier",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dossier updated successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains updated data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.message).to.include('updated');",
+                                    "});",
+                                    "",
+                                    "pm.test('Updated fields are correct', function () {",
+                                    "    const dossier = pm.response.json().data;",
+                                    "    const requestBody = JSON.parse(pm.request.body.raw);",
+                                    "    ",
+                                    "    if (requestBody.nationality) {",
+                                    "        pm.expect(dossier.nationality).to.equal(requestBody.nationality);",
+                                    "    }",
+                                    "    if (requestBody.visa_type) {",
+                                    "        pm.expect(dossier.visa_type).to.equal(requestBody.visa_type);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nationality\": \"US\",\n    \"visa_type\": \"business\",\n    \"application_status\": \"submitted\",\n    \"notes\": \"Updated via Postman API testing\",\n    \"additional_data\": {\n        \"purpose_of_visit\": \"Business meetings and conferences\",\n        \"intended_duration\": \"1 week\",\n        \"company\": \"Tech Solutions Inc.\"\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}"
+                            ]
+                        },
+                        "description": "Update an existing dossier. All fields are optional - only provided fields will be updated.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier to update\n\n**Optional Fields:**\n- passport_number: Alphanumeric passport number\n- nationality: Country code or name\n- date_of_birth: Date in YYYY-MM-DD format\n- visa_type: One of: tourist, student, work, business, transit\n- application_status: One of: draft, submitted, processing, approved, rejected\n- notes: Additional notes or comments\n- additional_data: JSON object with extra information"
+                    },
+                    "response": [
+                        {
+                            "name": "Update Dossier",
+                            "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"nationality\": \"US\",\n    \"visa_type\": \"business\",\n    \"application_status\": \"submitted\",\n    \"notes\": \"Updated via Postman API testing\",\n    \"additional_data\": {\n        \"purpose_of_visit\": \"Business meetings and conferences\",\n        \"intended_duration\": \"1 week\",\n        \"company\": \"Tech Solutions Inc.\"\n    }\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:18:37 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Dossier updated successfully.\",\n    \"data\": {\n        \"id\": 2,\n        \"user_id\": 1,\n        \"passport_number\": \"f914\",\n        \"nationality\": \"US\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"visa_type\": \"business\",\n        \"visa_type_label\": \"Business Visa\",\n        \"application_status\": \"submitted\",\n        \"application_status_label\": \"Submitted\",\n        \"application_status_color\": \"blue\",\n        \"notes\": \"Updated via Postman API testing\",\n        \"additional_data\": {\n            \"purpose_of_visit\": \"Business meetings and conferences\",\n            \"intended_duration\": \"1 week\"\n        },\n        \"created_at\": \"2025-07-09T22:05:10.000000Z\",\n        \"updated_at\": \"2025-07-09T22:18:37.000000Z\",\n        \"has_required_documents\": false,\n        \"can_submit\": false\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete Dossier",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dossier deleted successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains success message', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson.message).to.include('deleted');",
+                                    "});",
+                                    "",
+                                    "// Clear the stored dossier ID since it's been deleted",
+                                    "pm.environment.unset('dossier_id');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}"
+                            ]
+                        },
+                        "description": "Delete a dossier and all associated documents.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier to delete\n\n**Warning:** This action is irreversible and will delete all associated documents and files."
+                    },
+                    "response": [
+                        {
+                            "name": "Delete Dossier",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:18:54 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Dossier deleted successfully.\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Visa dossier CRUD operations and management",
+            "auth": {
+                "type": "bearer",
+                "bearer": [
+                    {
+                        "key": "token",
+                        "value": "{{auth_token}}",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "📄 Document Management",
+            "item": [
+                {
+                    "name": "Get Document Types",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Document types retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains document types', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.be.an('array');",
+                                    "    pm.expect(responseJson.data.length).to.be.above(0);",
+                                    "});",
+                                    "",
+                                    "pm.test('Document type structure is valid', function () {",
+                                    "    const types = pm.response.json().data;",
+                                    "    const firstType = types[0];",
+                                    "    pm.expect(firstType).to.have.property('value');",
+                                    "    pm.expect(firstType).to.have.property('label');",
+                                    "    ",
+                                    "    // Store a document type for use in upload",
+                                    "    pm.environment.set('document_type', firstType.value);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/types",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents",
+                                "types"
+                            ]
+                        },
+                        "description": "Get list of all available document types.\n\n**Authentication:** Bearer token required\n\n**Response:**\n- data: Array of document type objects with value and label\n\n**Available Types:**\n- passport: Passport\n- birth_certificate: Birth Certificate\n- marriage_certificate: Marriage Certificate\n- proof_of_income: Proof of Income\n- bank_statement: Bank Statement\n- accommodation_proof: Accommodation Proof\n- health_insurance: Health Insurance\n- criminal_record: Criminal Record\n- educational_certificate: Educational Certificate\n- employment_contract: Employment Contract\n- visa_application_form: Visa Application Form\n- passport_photo: Passport Photo\n- other: Other"
+                    },
+                    "response": [
+                        {
+                            "name": "Get Document Types",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/types",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}",
+                                        "documents",
+                                        "types"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 21:50:34 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"data\": [\n        {\n            \"value\": \"passport\",\n            \"label\": \"Passport\"\n        },\n        {\n            \"value\": \"birth_certificate\",\n            \"label\": \"Birth Certificate\"\n        },\n        {\n            \"value\": \"marriage_certificate\",\n            \"label\": \"Marriage Certificate\"\n        },\n        {\n            \"value\": \"proof_of_income\",\n            \"label\": \"Proof of Income\"\n        },\n        {\n            \"value\": \"bank_statement\",\n            \"label\": \"Bank Statement\"\n        },\n        {\n            \"value\": \"accommodation_proof\",\n            \"label\": \"Accommodation Proof\"\n        },\n        {\n            \"value\": \"health_insurance\",\n            \"label\": \"Health Insurance\"\n        },\n        {\n            \"value\": \"criminal_record\",\n            \"label\": \"Criminal Record\"\n        },\n        {\n            \"value\": \"educational_certificate\",\n            \"label\": \"Educational Certificate\"\n        },\n        {\n            \"value\": \"employment_contract\",\n            \"label\": \"Employment Contract\"\n        },\n        {\n            \"value\": \"visa_application_form\",\n            \"label\": \"Visa Application Form\"\n        },\n        {\n            \"value\": \"passport_photo\",\n            \"label\": \"Passport Photo\"\n        },\n        {\n            \"value\": \"other\",\n            \"label\": \"Other\"\n        }\n    ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "List Dossier Documents",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Documents retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains documents data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test('Document structure is valid', function () {",
+                                    "    const documents = pm.response.json().data;",
+                                    "    if (documents.length > 0) {",
+                                    "        const document = documents[0];",
+                                    "        pm.expect(document).to.have.property('id');",
+                                    "        pm.expect(document).to.have.property('document_type');",
+                                    "        pm.expect(document).to.have.property('name');",
+                                    "        pm.expect(document).to.have.property('file_size');",
+                                    "        ",
+                                    "        // Store first document ID for use in other requests",
+                                    "        pm.environment.set('document_id', document.id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents"
+                            ],
+                            "query": [
+                                {
+                                    "key": "document_type",
+                                    "value": "passport",
+                                    "description": "Filter by document type",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Get list of all documents for a specific dossier.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier\n\n**Query Parameters:**\n- document_type: Filter by specific document type (optional)\n\n**Response:**\n- data: Array of document objects\n- meta: Metadata including total count and file sizes"
+                    },
+                    "response": [
+                        {
+                            "name": "List Dossier Documents",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}",
+                                        "documents"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "document_type",
+                                            "value": "passport",
+                                            "description": "Filter by document type",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:16:12 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"data\": [\n        {\n            \"id\": 8,\n            \"dossier_id\": 2,\n            \"document_type\": \"passport\",\n            \"document_type_label\": \"Passport\",\n            \"name\": \"Passport - Ernest Dooley\",\n            \"description\": \"Passport document uploaded via Postman API testing\",\n            \"file_size\": 129990,\n            \"file_size_formatted\": \"126.94 KB\",\n            \"mime_type\": \"application/pdf\",\n            \"original_filename\": \"visa_dossier.pdf\",\n            \"file_url\": \"http://localhost:8000/storage/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n            \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n            \"thumbnail_url\": \"http://localhost:8000/storage/8/conversions/passport_2025-07-09_22-15-26_8c933413-thumb.jpg\",\n            \"uploaded_at\": \"2025-07-09T22:15:26.000000Z\",\n            \"updated_at\": \"2025-07-09T22:15:26.000000Z\"\n        },\n        {\n            \"id\": 6,\n            \"dossier_id\": 2,\n            \"document_type\": \"passport\",\n            \"document_type_label\": \"Passport\",\n            \"name\": \"Passport - Antonio Feeney DDS\",\n            \"description\": \"Passport document uploaded via Postman API testing\",\n            \"file_size\": 115284,\n            \"file_size_formatted\": \"112.58 KB\",\n            \"mime_type\": \"image/jpeg\",\n            \"original_filename\": \"cropped-20240731_134218.jpg\",\n            \"file_url\": \"http://localhost:8000/storage/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n            \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/6/passport_2025-07-09_22-08-23_10dcbc7c.jpg\",\n            \"thumbnail_url\": \"http://localhost:8000/storage/6/conversions/passport_2025-07-09_22-08-23_10dcbc7c-thumb.jpg\",\n            \"uploaded_at\": \"2025-07-09T22:08:23.000000Z\",\n            \"updated_at\": \"2025-07-09T22:08:23.000000Z\"\n        },\n        {\n            \"id\": 5,\n            \"dossier_id\": 2,\n            \"document_type\": \"passport\",\n            \"document_type_label\": \"Passport\",\n            \"name\": \"Passport - Jody Wintheiser\",\n            \"description\": \"Passport document uploaded via Postman API testing\",\n            \"file_size\": 115284,\n            \"file_size_formatted\": \"112.58 KB\",\n            \"mime_type\": \"image/jpeg\",\n            \"original_filename\": \"cropped-20240731_134218.jpg\",\n            \"file_url\": \"/storage/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n            \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/5/passport_2025-07-09_22-05-20_aa901071.jpg\",\n            \"thumbnail_url\": \"/storage/5/conversions/passport_2025-07-09_22-05-20_aa901071-thumb.jpg\",\n            \"uploaded_at\": \"2025-07-09T22:05:20.000000Z\",\n            \"updated_at\": \"2025-07-09T22:05:20.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"total\": 3\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Upload Document",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Document(s) uploaded successfully', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains document data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.have.property('id');",
+                                    "    ",
+                                    "    // Store document ID for use in other requests",
+                                    "    pm.environment.set('document_id', responseJson.data.id);",
+                                    "});",
+                                    "",
+                                    "pm.test('Document data is correct', function () {",
+                                    "    const document = pm.response.json().data;",
+                                    "    pm.expect(document).to.have.property('document_type');",
+                                    "    pm.expect(document).to.have.property('name');",
+                                    "    pm.expect(document).to.have.property('file_size');",
+                                    "    pm.expect(document).to.have.property('mime_type');",
+                                    "    pm.expect(document).to.have.property('original_filename');",
+                                    "});",
+                                    "",
+                                    "pm.test('Message indicates successful upload', function () {",
+                                    "    const message = pm.response.json().message;",
+                                    "    pm.expect(message).to.include('uploaded successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "files",
+                                    "description": "Multiple document files (PDF, PNG, JPG, JPEG - max 4MB each, max 10 files)",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "files",
+                                    "description": "Additional file (optional)",
+                                    "type": "file",
+                                    "src": [],
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "files",
+                                    "description": "Additional file (optional)",
+                                    "type": "file",
+                                    "src": [],
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "document_type",
+                                    "value": "passport",
+                                    "description": "Type of document being uploaded",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "value": "Passport Documents - {{$randomFullName}}",
+                                    "description": "Descriptive name for the document group",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "value": "Multiple passport documents uploaded via Postman API testing",
+                                    "description": "Optional description",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents"
+                            ]
+                        },
+                        "description": "Upload multiple documents to a specific dossier.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier\n\n**Form Data Fields:**\n- files[]: Multiple document files (required) - you can add multiple 'files' keys\n- document_type: Type of document (required)\n- name: Descriptive name for the document group (required)\n- description: Optional description\n\n**File Requirements:**\n- Formats: PDF, PNG, JPG, JPEG\n- Maximum size: 4MB per file\n- Maximum files: 10 files per upload\n\n**Note:** \n1. You need to select files in the 'files' fields before sending\n2. Enable additional 'files' fields as needed\n3. All files will be grouped under one document with the first file's properties used for metadata\n4. Use the same 'files' key name for multiple files to create an array"
+                    },
+                    "response": [
+                        {
+                            "name": "Upload Document",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "files",
+                                            "description": "Multiple document files (PDF, PNG, JPG, JPEG - max 4MB each, max 10 files)",
+                                            "type": "file",
+                                            "src": "/Users/user/Downloads/visa_dossier.pdf"
+                                        },
+                                        {
+                                            "key": "files",
+                                            "description": "Additional file",
+                                            "type": "file",
+                                            "src": "/Users/user/Downloads/passport_photo.jpg"
+                                        },
+                                        {
+                                            "key": "document_type",
+                                            "value": "passport",
+                                            "description": "Type of document being uploaded",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "name",
+                                            "value": "Passport Documents - {{$randomFullName}}",
+                                            "description": "Descriptive name for the document group",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "value": "Multiple passport documents uploaded via Postman API testing",
+                                            "description": "Optional description",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}",
+                                        "documents"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:15:26 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Document uploaded successfully.\",\n    \"data\": {\n        \"id\": 8,\n        \"dossier_id\": 2,\n        \"document_type\": \"passport\",\n        \"document_type_label\": \"Passport\",\n        \"name\": \"Passport - Ernest Dooley\",\n        \"description\": \"Passport document uploaded via Postman API testing\",\n        \"file_size\": 129990,\n        \"file_size_formatted\": \"126.94 KB\",\n        \"mime_type\": \"application/pdf\",\n        \"original_filename\": \"visa_dossier.pdf\",\n        \"file_url\": \"http://localhost:8000/storage/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n        \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n        \"thumbnail_url\": \"http://localhost:8000/storage/8/conversions/passport_2025-07-09_22-15-26_8c933413-thumb.jpg\",\n        \"uploaded_at\": \"2025-07-09T22:15:26.000000Z\",\n        \"updated_at\": \"2025-07-09T22:15:26.000000Z\"\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Document Details",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Document retrieved successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains document data', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('data');",
+                                    "    pm.expect(responseJson.data).to.have.property('id');",
+                                    "    pm.expect(responseJson.data).to.have.property('document_type');",
+                                    "    pm.expect(responseJson.data).to.have.property('name');",
+                                    "});",
+                                    "",
+                                    "pm.test('Document ID matches requested', function () {",
+                                    "    const documentId = pm.response.json().data.id;",
+                                    "    const requestedId = pm.environment.get('document_id');",
+                                    "    pm.expect(documentId.toString()).to.equal(requestedId.toString());",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/{{document_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents",
+                                "{{document_id}}"
+                            ]
+                        },
+                        "description": "Get detailed information about a specific document.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier\n- document_id: ID of the document\n\n**Response:**\n- data: Complete document object with metadata"
+                    },
+                    "response": [
+                        {
+                            "name": "Get Document Details",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/{{document_id}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}",
+                                        "documents",
+                                        "{{document_id}}"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:15:38 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"data\": {\n        \"id\": 8,\n        \"dossier_id\": 2,\n        \"document_type\": \"passport\",\n        \"document_type_label\": \"Passport\",\n        \"name\": \"Passport - Ernest Dooley\",\n        \"description\": \"Passport document uploaded via Postman API testing\",\n        \"file_size\": 129990,\n        \"file_size_formatted\": \"126.94 KB\",\n        \"mime_type\": \"application/pdf\",\n        \"original_filename\": \"visa_dossier.pdf\",\n        \"file_url\": \"http://localhost:8000/storage/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n        \"file_path\": \"/Users/user/Desktop/apps/web/visa_dossier/api/storage/app/private/visa-documents/8/passport_2025-07-09_22-15-26_8c933413.pdf\",\n        \"thumbnail_url\": \"http://localhost:8000/storage/8/conversions/passport_2025-07-09_22-15-26_8c933413-thumb.jpg\",\n        \"uploaded_at\": \"2025-07-09T22:15:26.000000Z\",\n        \"updated_at\": \"2025-07-09T22:15:26.000000Z\"\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Download Document",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Document download initiated successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response is a file', function () {",
+                                    "    const contentType = pm.response.headers.get('Content-Type');",
+                                    "    pm.expect(contentType).to.satisfy(function (ct) {",
+                                    "        return ct.includes('application/') || ct.includes('image/');",
+                                    "    });",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has content disposition header', function () {",
+                                    "    pm.expect(pm.response.headers.has('Content-Disposition')).to.be.true;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/{{document_id}}/download",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents",
+                                "{{document_id}}",
+                                "download"
+                            ]
+                        },
+                        "description": "Download a specific document file.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier\n- document_id: ID of the document\n\n**Response:**\n- Binary file data with appropriate Content-Type and Content-Disposition headers"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Document",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Document deleted successfully', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response contains success message', function () {",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson).to.have.property('message');",
+                                    "    pm.expect(responseJson.message).to.include('deleted');",
+                                    "});",
+                                    "",
+                                    "// Clear the stored document ID since it's been deleted",
+                                    "pm.environment.unset('document_id');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{auth_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/{{document_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dossiers",
+                                "{{dossier_id}}",
+                                "documents",
+                                "{{document_id}}"
+                            ]
+                        },
+                        "description": "Delete a specific document and its associated file.\n\n**Authentication:** Bearer token required\n\n**Path Parameters:**\n- dossier_id: ID of the dossier\n- document_id: ID of the document to delete\n\n**Warning:** This action is irreversible and will permanently delete the document and its file."
+                    },
+                    "response": [
+                        {
+                            "name": "Delete Document",
+                            "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/dossiers/{{dossier_id}}/documents/{{document_id}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "dossiers",
+                                        "{{dossier_id}}",
+                                        "documents",
+                                        "{{document_id}}"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Host",
+                                    "value": "localhost:8000"
+                                },
+                                {
+                                    "key": "Connection",
+                                    "value": "close"
+                                },
+                                {
+                                    "key": "X-Powered-By",
+                                    "value": "PHP/8.4.5"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "Date",
+                                    "value": "Wed, 09 Jul 2025 22:11:04 GMT"
+                                },
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                },
+                                {
+                                    "key": "Access-Control-Allow-Origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Document deleted successfully.\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Document management within visa dossiers",
+            "auth": {
+                "type": "bearer",
+                "bearer": [
+                    {
+                        "key": "token",
+                        "value": "{{auth_token}}",
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{auth_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Global pre-request script for authentication and setup",
+                    "",
+                    "// Check if we have an auth token",
+                    "const authToken = pm.environment.get('auth_token');",
+                    "",
+                    "// If no token and this is not an auth endpoint, show warning",
+                    "if (!authToken && !pm.request.url.toString().includes('/auth/')) {",
+                    "    console.warn('No authentication token found. Please login first.');",
+                    "}",
+                    "",
+                    "// Set Accept header for all requests",
+                    "pm.request.headers.add({",
+                    "    key: 'Accept',",
+                    "    value: 'application/json'",
+                    "});",
+                    "",
+                    "// Log request details for debugging",
+                    "console.log(`Making ${pm.request.method} request to: ${pm.request.url}`);",
+                    "",
+                    "// Add timestamp to environment for unique data generation",
+                    "pm.environment.set('timestamp', Date.now());"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Global post-response script for common validations",
+                    "",
+                    "// Log response details",
+                    "console.log(`Response Status: ${pm.response.status} ${pm.response.reason()}`);",
+                    "console.log(`Response Time: ${pm.response.responseTime}ms`);",
+                    "",
+                    "// Common tests for all API endpoints",
+                    "pm.test('Response time is acceptable', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                    "});",
+                    "",
+                    "pm.test('Response has proper Content-Type', function () {",
+                    "    const contentType = pm.response.headers.get('Content-Type');",
+                    "    if (pm.response.status !== 200 || !pm.request.url.toString().includes('/download')) {",
+                    "        pm.expect(contentType).to.include('application/json');",
+                    "    }",
+                    "});",
+                    "",
+                    "// Validate error responses",
+                    "if (pm.response.status >= 400) {",
+                    "    pm.test('Error response has message', function () {",
+                    "        const responseJson = pm.response.json();",
+                    "        pm.expect(responseJson).to.have.property('message');",
+                    "    });",
+                    "}",
+                    "",
+                    "// Validate success responses for JSON endpoints",
+                    "if (pm.response.status >= 200 && pm.response.status < 300) {",
+                    "    const contentType = pm.response.headers.get('Content-Type');",
+                    "    if (contentType && contentType.includes('application/json')) {",
+                    "        pm.test('Response is valid JSON', function () {",
+                    "            pm.response.to.be.json;",
+                    "        });",
+                    "    }",
+                    "}"
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        }
+    ]
+}
